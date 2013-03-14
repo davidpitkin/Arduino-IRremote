@@ -131,6 +131,12 @@
 #define RC6_T1		444
 #define RC6_RPT_LENGTH	46000
 
+#define BEO_BIT_MARK	200
+#define BEO_ZERO		2925
+#define BEO_SAME		6050
+#define BEO_ONE			9175
+#define BEO_HDR_SPACE	15000
+
 #define SHARP_BIT_MARK 245
 #define SHARP_ONE_SPACE 1805
 #define SHARP_ZERO_SPACE 795
@@ -166,7 +172,7 @@
 #define LTOL (1.0 - TOLERANCE/100.) 
 #define UTOL (1.0 + TOLERANCE/100.) 
 
-#define _GAP 5000 // Minimum map between transmissions
+#define _GAP 18000 // Minimum map between transmissions increased from 5000 B&0
 #define GAP_TICKS (_GAP/USECPERTICK)
 
 #define TICKS_LOW(us) (int) (((us)*LTOL/USECPERTICK))
@@ -213,7 +219,7 @@ extern volatile irparams_t irparams;
 #define MIN_RC6_SAMPLES 1
 #define PANASONIC_BITS 48
 #define JVC_BITS 16
-
+#define BEO_BITS 16
 
 
 

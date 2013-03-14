@@ -410,6 +410,13 @@ int IRrecv::decode(decode_results *results) {
     return DECODED;
   }
 #ifdef DEBUG
+  Serial.println("Attempting BEO decode");
+#endif  
+  if (decodeBEO(results)) {
+    return DECODED;
+  }
+#ifdef DEBUG
+#ifdef DEBUG
   Serial.println("Attempting Mitsubishi decode");
 #endif
   if (decodeMitsubishi(results)) {
@@ -551,6 +558,70 @@ long IRrecv::decodeSony(decode_results *results) {
   return DECODED;
 }
 
+long IRrecv::decodeBEO(decode_results *results) {
+  long long data = 0;
+  int offset = 1; // Skip first space
+  int bit = 0;
+  // Check size of message
+  if (irparams.rawlen < 2 * BEO_BITS + 4) {
+    return ERR;
+  }
+  if (!MATCH_MARK(results->rawbuf[offset], BEO_BIT_MARK)) {
+    return ERR;
+  }
+  offset++;
+  // Initial 0
+  if (!MATCH_SPACE(results->rawbuf[offset], BEO_ZERO)) {
+    return ERR;
+  }
+  offset++;
+  if (!MATCH_MARK(results->rawbuf[offset], BEO_BIT_MARK)) {
+    return ERR;
+  }
+  offset++;
+  // Same as Last 0
+  if (!MATCH_SPACE(results->rawbuf[offset], BEO_ZERO)) {
+    return ERR;
+  }
+  offset++;
+  if (!MATCH_MARK(results->rawbuf[offset], BEO_BIT_MARK)) {
+    return ERR;
+  }
+  offset++;
+  if (!MATCH_SPACE(results->rawbuf[offset], BEO_HDR_SPACE)) {
+    return ERR;
+  }
+  offset++;
+  for (int i = 0; i < BEO_BITS; i++) {
+    if (!MATCH_MARK(results->rawbuf[offset], BEO_BIT_MARK)) {
+      return ERR;
+    }
+    offset++;
+    if (MATCH_SPACE(results->rawbuf[offset], BEO_ZERO)) {
+      bit = 0;
+    } 
+    else if (MATCH_SPACE(results->rawbuf[offset], BEO_ONE)) {
+      bit = 1;
+    } 
+    else if (MATCH_SPACE(results->rawbuf[offset], BEO_SAME)) {
+	  // do nothing, same
+    } 
+    else {
+      return ERR;
+    }
+#ifdef DEBUG
+    Serial.println("bit:");
+    Serial.println(bit);
+#endif
+  data = (data << 1) | bit;
+  offset++;
+  }
+  // Success
+  results->bits = BEO_BITS;
+  results->value = data;
+  results->decode_type = BEO;
+  return DECODED;
+}
 // I think this is a Sanyo decoder - serial = SA 8650B
 // Looks like Sony except for timings, 48 chars of data and time/space different
 long IRrecv::decodeSanyo(decode_results *results) {

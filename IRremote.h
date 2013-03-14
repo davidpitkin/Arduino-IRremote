@@ -4,6 +4,7 @@
  * Copyright 2009 Ken Shirriff
  * For details, see http://arcfn.com/2009/08/multi-protocol-infrared-remote-library.htm http://arcfn.com
  * Edited by Mitra to add new controller SANYO
+ * Edited by Pitkin to add Beo
  *
  * Interrupt code based on NECIRrcv by Joe Knapp
  * http://www.arduino.cc/cgi-bin/yabb2/YaBB.pl?num=1210243556
@@ -20,8 +21,8 @@
 // If DEBUG is defined, a lot of debugging output will be printed during decoding.
 // TEST must be defined for the IRtest unittests to work.  It will make some
 // methods virtual, which will be slightly slower, which is why it is optional.
-// #define DEBUG
-// #define TEST
+#define DEBUG
+#define TEST
 
 // Results returned from the decoder
 class decode_results {
@@ -45,6 +46,7 @@ public:
 #define JVC 8
 #define SANYO 9
 #define MITSUBISHI 10
+#define BEO 11
 #define UNKNOWN -1
 
 // Decoded value for NEC when a repeat code is received
@@ -69,10 +71,10 @@ private:
   long decodeRC5(decode_results *results);
   long decodeRC6(decode_results *results);
   long decodePanasonic(decode_results *results);
+  long decodeBEO(decode_results *results);
   long decodeJVC(decode_results *results);
   long decodeHash(decode_results *results);
   int compare(unsigned int oldval, unsigned int newval);
-
 } 
 ;
 
